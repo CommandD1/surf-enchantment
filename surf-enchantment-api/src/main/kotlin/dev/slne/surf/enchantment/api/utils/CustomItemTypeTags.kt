@@ -28,6 +28,7 @@ enum class CustomItemTypeTags(
         TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_WEAPON),
         TagEntry.tagEntry(ItemTypeTagKeys.PICKAXES),
         TagEntry.tagEntry(ItemTypeTagKeys.AXES),
+        TagEntry.tagEntry(ItemTypeTagKeys.HOES),
         TagEntry.valueEntry(ItemTypeKeys.FISHING_ROD),
         TagEntry.valueEntry(ItemTypeKeys.TRIDENT)
     ),
