@@ -11,6 +11,10 @@ import dev.slne.surf.enchantment.api.utils.hasCustomEnchantment
 import dev.slne.surf.enchantment.paper.plugin
 import kotlinx.coroutines.delay
 import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.entity.GlowItemFrame
+import org.bukkit.entity.ItemFrame
+import org.bukkit.entity.Painting
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
@@ -20,6 +24,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.ItemSpawnEvent
+import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.player.PlayerShearEntityEvent
 import org.bukkit.event.vehicle.VehicleDestroyEvent
 import org.bukkit.inventory.ItemStack
@@ -79,6 +84,37 @@ object TelekinesisListener : Listener {
 
         player.giveExp(event.droppedExp, true)
         event.droppedExp = 0
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onHangingBreakByEntity(event: HangingBreakByEntityEvent) {
+        val player = event.remover as? Player ?: return
+        if (!player.inventory.itemInMainHand.hasCustomEnchantment<TelekinesisEnchantment>()) return
+
+        val hanging = event.entity
+        val dropLocation = hanging.location.clone()
+        val drops = mutableListOf<ItemStack>()
+
+        when (hanging) {
+            is ItemFrame -> {
+                val material = if (hanging is GlowItemFrame) Material.GLOW_ITEM_FRAME else Material.ITEM_FRAME
+                drops.add(ItemStack(material))
+
+                val innerItem = hanging.item
+                if (innerItem.type != Material.AIR) {
+                    drops.add(innerItem.clone())
+                }
+            }
+
+            is Painting -> {
+                drops.add(ItemStack(Material.PAINTING))
+            }
+            else -> return
+        }
+
+        if (addDropsToInventory(player, drops, event, dropLocation)) {
+            hanging.remove()
+        }
     }
 
     @EventHandler

@@ -11,6 +11,7 @@ import io.papermc.paper.registry.keys.EnchantmentKeys
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextReplacementConfig
 import org.jetbrains.annotations.Range
 import kotlin.math.ceil
 import kotlin.math.min
@@ -787,10 +788,12 @@ private fun levelBased(
         var newLine = line
 
         placeholders.forEach { (placeholder, value) ->
-            newLine = newLine.replaceText {
-                it.matchLiteral("%$placeholder%")
-                it.replacement(value)
-            }
+            newLine = newLine.replaceText(
+                TextReplacementConfig.builder()
+                    .matchLiteral("%$placeholder%")
+                    .replacement(value)
+                    .build()
+            )
         }
 
         line {
